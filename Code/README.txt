@@ -1,5 +1,3 @@
-Harry Vancao
-
 This is a Matlab implementation of four machine learning algorithms.
 
 The code is split into four functions. The intention is that the functions enforce a format of data and classify on that. Thereby 
@@ -34,5 +32,3 @@ usage of the funcitons.
 To run the script file, navigate to the current directory in matlab and execute the top section first (titled: Load Datasets) 
 and then each subsequent section showcases a different combination of using the four functions on various datasets that were given 
 in the /Data folder. 
-
-Please see the attached report for a summary of the peformance of the algorithms on the included datasets.
