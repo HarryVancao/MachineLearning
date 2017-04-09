@@ -1,4 +1,4 @@
-%% Fisher's Linear Discriminant Analysis 
+%% Fisher's Linear Discriminant Analysis
 function [ reduced_training, reduced_test ] = LDA( train_data, train_label, test_data, c)
     % This function transforms the data c - 1 dimensional data where c is
     % the number of classes that we are discriminating. This is based on
@@ -37,7 +37,7 @@ function [ reduced_training, reduced_test ] = LDA( train_data, train_label, test
         Between_Scatter = Between_Scatter + (label_count(i) * ((mu(i) - M) * (mu(i) - M)')); 
     end
     
-    a = [det(Between_Scatter) det(Within_Scatter)]
+    %a = [det(Between_Scatter) det(Within_Scatter)]
     
     % solve for optimal W and yield the reduced dimension training
     % set. (correct within/between scatter from being singular)
@@ -52,4 +52,3 @@ function [ reduced_training, reduced_test ] = LDA( train_data, train_label, test
     reduced_training = W' * train_data; 
     reduced_test = W' * test_data;    
 end
-
