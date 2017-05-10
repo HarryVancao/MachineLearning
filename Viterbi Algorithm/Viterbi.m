@@ -16,7 +16,10 @@ PI = [0.5 ; 0.5];
 % 234213
 O = [2 3 4 2 1 3];
 
+% number of states 
 N = size(PI, 1); 
+
+% number of observations
 T = size(O, 2); 
 
 %% Evaluate + Decode
@@ -28,8 +31,7 @@ alpha(1, :) = PI(:) .* B(:, O(1));
 for i = 2:T 
     for j = 1:N 
         alpha(i, j) = sum(alpha(i - 1, :) .* A(j, :));
-    end 
-    
+    end     
     alpha(i, :) = alpha(i, :) .* B(:, O(i))';
 end 
 evaluation = sum(alpha(T, :));
@@ -49,7 +51,7 @@ for i = 1:T
     gamma(i, :) = alpha(i, :) .* beta(i, :); 
     gamma(i, :) = gamma(i, :) ./ sum(alpha(i, :) .* beta(i, :));
 end
-format long;
+
 % Viterbi
 delta = zeros(T, N); 
 delta(1, :) = PI(:) .* B(:, O(1));
@@ -63,12 +65,11 @@ end
 psi = zeros(T, N); 
 for i = 2:T    
     for j = 1:N
-        A(:, j)' .* delta(i - 1, :)
         [~,  psi(i, j)] = max(A(:, j)' .* delta(i - 1, :));
     end 
 end 
 
-% Results
+% Backtrack and compute optimal state paths.
 Q = zeros(T, 1); 
 % initialize from delta filter
 [~, Q(T)] = max(delta(T, :));
@@ -76,6 +77,7 @@ for i = T - 1:-1:1
     Q(i) = psi(i + 1, Q(i + 1));
 end 
 
+% print out results
 evaluation
 Q 
 
