@@ -1,52 +1,81 @@
-function [stateSequence] = Viterbi(Model, obsSequence)
-%VITERBI Runs the Viterbi algorithm
-%   Takes as input the HMM and the observation sequence and return the most
-%   probable (hidden) state sequence.
-%   Model is a struct that contains the HMM. It has to contain:
-%       1. nbStates: number of states of the HMM
-%       2. nbSymbol: number of possible observation in the sequence
-%       3. transition: transition matrix; transition(i,j) = probability of
-%          ending in j while having being in i at the previous step
-%       4. priors: state priors, probability of being in state i at first step 
-%       5. obsProb: observation probabilities; obsProb(i,j) probability of observing j| being in i)
-%       6. states: string with the state labels (in a consistent order with
-%          the other variables)
-%       7. symbols: string with the symbol labels (in a consistent order with
-%          the other variables)
-%   obSequence is a string, describing the sequence of symbols/chars
+%% HMM Model Decoder
 
+%% Hidden Markov Model Parameters
+% Transition Matrix
+A = [0.8 0.2 ; 0.2 0.8];
 
-%%  Precomputations over observation sequence
-T = length(obsSequence);
-obsIndex = zeros(T);
-for i=1:T
-    obsIndex(i) = find(obsSequence(i) == Model.symbols);
+% Emission Matrix
+B = [0.4 0.1 0.4 0.1 ; 0.1 0.4 0.1 0.4];
+
+% Initial State Probabilities
+PI = [0.5 ; 0.5];
+
+% observations
+% ACGT
+% CGTCAG
+% 234213
+O = [2 3 4 2 1 3];
+
+N = size(PI, 1); 
+T = size(O, 2); 
+
+%% Evaluate + Decode
+
+% forward algorithm
+alpha = zeros(T, N); 
+alpha(1, :) = PI(:) .* B(:, O(1)); 
+
+for i = 2:T 
+    for j = 1:N 
+        alpha(i, j) = sum(alpha(i - 1, :) .* A(j, :));
+    end 
+    
+    alpha(i, :) = alpha(i, :) .* B(:, O(i))';
+end 
+evaluation = sum(alpha(T, :));
+
+% backward algorithm calculate backwards filter. 
+beta = zeros(T, N); 
+beta(T, :) = 1;
+for i = T - 1:-1:1
+    for j = 1:N 
+        beta(i, j) = sum(beta(i + 1, :) .* A(j, :) .* B(:, O(i + 1))');
+    end 
+end 
+
+% posterior: forward-backward algorithm 
+gamma = zeros(T, N); 
+for i = 1:T 
+    gamma(i, :) = alpha(i, :) .* beta(i, :); 
+    gamma(i, :) = gamma(i, :) ./ sum(alpha(i, :) .* beta(i, :));
 end
-%%  Initialization
-T1 = zeros(Model.nbStates, T);    % Trellis variables
-T2 = zeros(Model.nbStates, T);
-
-T1(:,1) = Model.priors.*Model.obsProb(:,obsIndex(1));
-
-%%  Algorithm
-for i=2:T
-    for j=1:Model.nbStates
-        [T1(j,i),T2(j,i)] = max(T1(:,i-1).*Model.transition(:,j).*repmat(Model.obsProb(j,obsIndex(i)),Model.nbStates,1));
+format long;
+% Viterbi
+delta = zeros(T, N); 
+delta(1, :) = PI(:) .* B(:, O(1));
+for i = 2:T 
+    for j = 1:N 
+        
+        delta(i, j) = max(A(:, j)' .* delta(i-1, :)) * B(j, O(i));
     end
 end
 
-%%  Computation of state sequence
-X = zeros(1,T);
-[sequenceProbability, Z] = max(T1(:,T));
-X(T) = Z;
+psi = zeros(T, N); 
+for i = 2:T    
+    for j = 1:N
+        A(:, j)' .* delta(i - 1, :)
+        [~,  psi(i, j)] = max(A(:, j)' .* delta(i - 1, :));
+    end 
+end 
 
-for i=T:-1:2
-    Z = T2(Z,i);
-    X(i-1) = Z;
-end
+% Results
+Q = zeros(T, 1); 
+% initialize from delta filter
+[~, Q(T)] = max(delta(T, :));
+for i = T - 1:-1:1
+    Q(i) = psi(i + 1, Q(i + 1));
+end 
 
-stateSequence='';
-for i=1:T
-    stateSequence(i) = Model.states(X(i));
-end
-end
+evaluation
+Q 
+
