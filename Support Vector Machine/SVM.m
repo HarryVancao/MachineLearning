@@ -11,10 +11,10 @@ num_test_examples = 10000;
 % load mnist data
 % functions downloaded from: 
 %http://ufldl.stanford.edu/wiki/resources/mnistHelper.zip
-images = loadMNISTImages('train-images-idx3-ubyte');
-labels = loadMNISTLabels('train-labels-idx1-ubyte');
-test_images = loadMNISTImages('t10k-images-idx3-ubyte');
-test_label = loadMNISTLabels('t10k-labels-idx1-ubyte'); 
+images = loadMNISTImages('../Data/train-images-idx3-ubyte');
+labels = loadMNISTLabels('../train-labels-idx1-ubyte');
+test_images = loadMNISTImages('../t10k-images-idx3-ubyte');
+test_label = loadMNISTLabels('../t10k-labels-idx1-ubyte'); 
 
 % use shear test set? 
 if use_sheared == true 
