@@ -1,4 +1,8 @@
-%% HMM Model Decoder
+%% HMM Model Decoder 
+
+% This code is based on the 1989 Paper A Tutorial on Hidden Markov Models
+% by Lawrence Rabiner. Hence the variable names that were used reflect
+% those used in the tutorial. 
 
 %% Hidden Markov Model Parameters
 % Transition Matrix
